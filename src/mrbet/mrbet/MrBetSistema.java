@@ -1,13 +1,12 @@
 package mrbet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class MrBetSistema {
     // Atributos
-    private HashMap<String, Time> mapaTimes;
-    private HashMap<String, Campeonato> mapaCampeonatos;
-    private ArrayList<Aposta> apostas;
+    private HashMap<String, Time> mapaTimes; // Mapa de times, onde um codigoId aponta para um Time
+    private HashMap<String, Campeonato> mapaCampeonatos; // Mapa de Campeonatos, onde um nome aponta para um Campeonato
+    private ArrayList<Aposta> apostas; // Lista de Apostas
 
     // Construtor
     public MrBetSistema() {
@@ -18,25 +17,16 @@ public class MrBetSistema {
 
     // Métodos
 
-    private boolean temTime(String codigoId) {
-        if (mapaTimes.containsKey(codigoId)) {
-            return true;
-        } else {
-            return false;
-        }
+    public ArrayList<Aposta> getApostas() {
+        return this.apostas;
     }
 
-    private boolean temCampeonato(String nome) {
-        if (mapaCampeonatos.containsKey(nome)) {
-            return true;
-        } else {
-            return false;
-        }
+    public HashMap<String, Time> getMapaTimes(){
+        return this.mapaTimes;
     }
 
-    private Campeonato pegaCampeonato(String nome) {
-        Campeonato c = mapaCampeonatos.get(nome);
-        return c;
+    public HashMap<String, Campeonato> getMapaCampeonatos(){
+        return this.mapaCampeonatos;
     }
 
     private Time pegaTime(String codigoId) {
@@ -44,109 +34,47 @@ public class MrBetSistema {
         return t;
     }
 
-    public void cadastraTime(String codigoId, String nome, String mascote) {
-        if (temTime(codigoId)) {
-            System.out.println("TIME JÁ EXISTE!\n");
-        } else {
-            Time t = new Time(codigoId, nome, mascote);
-            mapaTimes.put(codigoId, t);
-            System.out.println("INCLUSÃO REALIZADA!\n");
-        }
+    private Campeonato pegaCampeonato(String nome) {
+        Campeonato c = mapaCampeonatos.get(nome);
+        return c;
     }
-
-    public void mostraTime(MrBetSistema mrbet, String codigoId) {
-        if (temTime(codigoId)) {
-            Time t = mapaTimes.get(codigoId);
-            System.out.println(t + "\n");
-        } else {
-            System.out.println("TIME NÃO EXISTE!\n");
-        }
+    
+    public void cadastraTime(String codigoId, String nome, String mascote) {
+        Time t = new Time(codigoId, nome, mascote);
+        mapaTimes.put(codigoId, t); 
     }
 
     public void cadastraCampeonato(String nome, int vagas) {
-        if (temCampeonato(nome)) {
-            System.out.println("CAMPEONATO JÁ EXISTE!\n");
-        } else {
-            Campeonato c = new Campeonato(nome, vagas);
-            this.mapaCampeonatos.put(nome, c);
-            System.out.println("CAMPEONATO ADICIONADO!\n");
-        }
+        Campeonato c = new Campeonato(nome, vagas);
+        this.mapaCampeonatos.put(nome, c);
     }
 
-    public void incluirTimeEmCamp(String codigoId, String nome) {
-        if (temTime(codigoId)) {
-            if (temCampeonato(nome)) {
-                Campeonato c = pegaCampeonato(nome);
-                if (c.getParticipantes() < c.getVagas()) {
-                    Time t = pegaTime(codigoId);
-                    c.adicionaParticipante(t);
-                } else {
-                    throw new IllegalArgumentException("TODOS OS TIMES DESSE CAMPEONATO JÁ FORAM INCLUÍDOS!");
-                }
-            } else {
-                throw new IllegalArgumentException("CAMPEONATO NÃO EXISTE!");
-            }
-        } else {
-            throw new IllegalArgumentException("TIME NÃO EXISTE!");
-        }
-    }
-
-    public void verifica(String codigoId, String nome) {
-        if (temTime(codigoId)) {
-            if (temCampeonato(nome)) {
-                Campeonato c = pegaCampeonato(nome);
-                if (c.temParticipante(codigoId)) {
-                    System.out.println("O TIME ESTÁ NO CAMPEONATO!\n");
-                } else {
-                    System.out.println("O TIME NÃO ESTÁ NO CAMPEONATO!\n");
-                }
-            } else {
-                throw new IllegalArgumentException("CAMPEONATO NÃO EXISTE!");
-            }
-        } else {
-            throw new IllegalArgumentException("TIME NÃO EXISTE!");
-        }
-    }
-
-    public void exibeCampeonatos(String codigoId) {
+    public void incluiTimeEmCamp(String codigoId, String nome) {
+        Campeonato c = pegaCampeonato(nome);
         Time t = pegaTime(codigoId);
-        System.out.println("Campeonatos do " + t.getNome() + ":");
-        for (Campeonato c : t.pegaCampeonatos().values()) {
-            System.out.println(c);
-        }
+        c.adicionaParticipante(t);
+        t.adicionaJogo(c);
 
     }
-
-    // olhar mapaApostas.put(1, a);
-    public void aposta(String codigoId, String nome, int colocacao, double valorAposta) {
-        if (temTime(codigoId)) {
-            if (temCampeonato(nome)) {
-                Campeonato c = pegaCampeonato(nome);
-                Time t = pegaTime(codigoId);
-
-                if (colocacao > c.getVagas()) {
-                    Aposta a = new Aposta(t, c, colocacao, valorAposta);
-                    apostas.add(a);
-                    System.out.println("APOSTA REGISTRADA!\n");
-                } else {
-                    System.out.println("APOSTA NÃO REGISTRADA!\n");
-                }
-
-            } else {
-                throw new IllegalArgumentException("CAMPEONATO NÃO EXISTE!");
-            }
+                
+    public boolean verifica(String codigoId, String nome) {
+        Campeonato c = pegaCampeonato(nome);
+        if (c.temParticipante(codigoId)) {
+            return true;
         } else {
-            throw new IllegalArgumentException("TIME NÃO EXISTE!");
-        }
-
-    }
-
-    public void mostraApostas() {
-        int cont = 1;
-        for (Aposta a : apostas) {
-            System.out.println(cont + ". " + a);
-            cont++;
+            return false;
         }
     }
 
+    public boolean aposta(String codigoId, String nome, int colocacao, double valorAposta) {
+        Campeonato c = pegaCampeonato(nome);
+        Time t = pegaTime(codigoId);
+        if (colocacao <= c.getVagas()) {
+            Aposta a = new Aposta(t, c, colocacao, valorAposta);
+            apostas.add(a);
+            return true;
+        } else {
+            return false;
+        }   
+    }
 }

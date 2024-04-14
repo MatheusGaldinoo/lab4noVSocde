@@ -2,10 +2,10 @@ package mrbet;
 
 public class Aposta {
     // Atributos
-    private Time t;
-    private Campeonato c;
-    private int colocacao;
-    private double valorAposta;
+    private Time t; // Time que está sendo apostado
+    private Campeonato c; // Campeonto que está sendo apotado
+    private int colocacao; // Colocação esperada que o time fique no campeonato
+    private double valorAposta; // Quantia investida na aposta
     
     // Construtor
     public Aposta(Time t, Campeonato c, int colocacao, double valorAposta) {
@@ -19,7 +19,6 @@ public class Aposta {
 
     @Override
     public String toString() {
-        return t + "\n" + c.getNome() + colocacao + "/" + c.getVagas() + "\n R$ " + valorAposta;
+        return t + "\n" + c.getNome() + "\n" + colocacao + "/" + c.getVagas() + "\nR$ " + valorAposta;
     }
-
 }
